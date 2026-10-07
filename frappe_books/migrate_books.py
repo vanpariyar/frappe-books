@@ -120,6 +120,17 @@ FIELD_RENAMES = {
         "startAt":       "start_at",
         "padZeros":      "pad_zeros",
     },
+    "Books Ledger Entry": {
+        "date": "posting_date",
+        "referenceType": "voucher_type",
+        "referenceName": "voucher_no",
+    },
+    "Books Stock Ledger Entry": {
+        "date": "posting_date",
+        "referenceType": "voucher_type",
+        "referenceName": "voucher_no",
+        "stockValueDiff": "stock_value_difference",
+    },
 }
 
 
@@ -150,8 +161,8 @@ def rename_fields(doctype, doc_dict):
         else:
             new_k = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', k).lower()
         
-        # If this is the parenttype column, rewrite the value to match the new Doctype name
-        if new_k in ("parenttype", "doc_type", "reference_type") and v:
+        # If this is a dynamic link column, rewrite the value to match the new Doctype name
+        if new_k in ("parenttype", "doc_type", "voucher_type") and v:
             mapped_type = get_mapping(v)
             if mapped_type:
                 v = mapped_type
@@ -313,7 +324,7 @@ def execute(file_url=None, file_path=None):
     # Rebuild nested set trees for hierarchical doctypes to fix report indentation/totals
     print("Rebuilding hierarchical trees...")
     from frappe.utils.nestedset import rebuild_tree
-    rebuild_tree("Books Account", "parent_books_account")
+    rebuild_tree("Books Account")
     
     print("Recalculating invoice totals...")
     for dt in ["Books Sales Invoice", "Books Purchase Invoice", "Books Payment", "Books Journal Entry"]:
